@@ -97,25 +97,45 @@ CREATE TABLE visits
 id SERIAL PRIMARY KEY,
 pats_id INT NOT NULL,
 docs_id INT NOT NULL,
-meds_id INT,
+location_id INT NOT NULL,
 FOREIGN KEY (pats_id) REFERENCES patients(id),
 FOREIGN KEY (docs_id) REFERENCES doctors(id),
-FOREIGN KEY (meds_id) REFERENCES medications(id)
+FOREIGN KEY (location_id) REFERENCES locations(id)
 );
 
 INSERT INTO visits
+(pats_id, docs_id, location_id)
 VALUES
-(1,2,5,3),
-(2,1,4,2),
-(3,5,2,NULL),
-(4,3,5,7),
-(5,4,1,NULL),
-(6,6,2,5),
-(7,7,3,NULL),
-(8,1,2,6),
-(9,3,1,NULL),
-(10,7,8,4),
-(11,4,3,NULL);
+(2,5,1),
+(1,4,2),
+(5,2,1),
+(3,5,4),
+(4,1,3),
+(6,2,2),
+(7,3,1),
+(1,2,3),
+(3,1,2),
+(7,8,4),
+(4,3,3);
+
+
+CREATE TABLE prescriptions 
+(
+id SERIAL PRIMARY KEY,
+visit_id INT NOT NULL,
+med_id INT NOT NULL,
+notes TEXT,
+FOREIGN KEY (visit_id) REFERENCES visits(id),
+FOREIGN KEY (med_id) REFERENCES medications(id)
+);
+
+INSERT INTO prescriptions
+(visit_id, med_id, notes)
+VALUES
+(3,1,'presented with high blood pressure prescribed 20mg Lisinopril'),
+(3,2,'patient also complained of heartburn so a two week supply Omeprazole was given'),
+(1,5,'patient given Codine for chronic pain'),
+(5,3, NULL);
 
 
 

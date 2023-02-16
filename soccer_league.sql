@@ -1,6 +1,23 @@
 -- from the terminal run:
 -- psql < soccer_league.sql
 
+-- Hey Alexander here are the commands to get the standings from the results/teams tables;
+
+-- for wins---
+
+-- SELECT team_name, SUM(CASE WHEN result = 'Win' THEN 1 ELSE 0 END)AS wins 
+-- FROM teams JOIN results ON teams.id = results.team_id GROUP BY team_name;
+
+-- for losses---
+
+-- SELECT team_name, SUM(CASE WHEN result = 'Loss' THEN 1 ELSE 0 END)AS losses 
+-- FROM teams JOIN results ON teams.id = results.team_id GROUP BY team_name;
+
+-- for draws----
+
+-- SELECT team_name, SUM(CASE WHEN result = 'Draw' THEN 1 ELSE 0 END)AS draws 
+-- FROM teams JOIN results ON teams.id = results.team_id GROUP BY team_name;
+
 DROP DATABASE IF EXISTS soccer_league;
 
 CREATE DATABASE soccer_league;
@@ -103,29 +120,47 @@ CREATE TABLE matches
 id SERIAL PRIMARY KEY,
 team_one_id INT NOT NULL,
 team_two_id INT NOT NULL,
-winning_team_id_null_if_draw INT,
+date_of_match DATE NOT NULL,
 head_ref_id INT NOT NULL,
+asst_ref_id INT,
 season_id INT NOT NULL,
 FOREIGN KEY (team_one_id) REFERENCES teams(id),
 FOREIGN KEY (team_two_id) REFERENCES teams(id),
-FOREIGN KEY (winning_team_id_null_if_draw) REFERENCES teams(id),
+FOREIGN KEY (asst_ref_id) REFERENCES referees(id),
 FOREIGN KEY (head_ref_id) REFERENCES referees(id),
 FOREIGN KEY (season_id) REFERENCES seasons(id)
 );
 
 INSERT INTO matches
-(team_one_id, team_two_id, winning_team_id_null_if_draw, head_ref_id, season_id)
+(team_one_id, team_two_id, date_of_match, head_ref_id, asst_ref_id, season_id)
 VALUES
-(4,3,3,2,6),
-(1,2,NULL,4,1),
-(2,5,5,6,2),
-(6,4,NULL,3,9),
-(3,7,7,5,4),
-(4,1,1,1,1),
-(3,6,6,4,7),
-(5,7,NULL,5,11),
-(1,4,4,6,3),
-(6,2,2,2,2);
+(2,3,'2020-07-12',2,4,9),
+(5,1,'2017-09-23',1,3,6),
+(4,6,'2022-05-02',5,6,11),
+(7,1,'2021-06-06',3,5,10),
+(3,6,'2019-09-13',1,2,8),
+(2,7,'2012-03-26',4,5,2);
+
+
+CREATE TABLE results
+(
+id SERIAL PRIMARY KEY,
+team_id INT NOT NULL,
+match_id INT NOT NULL,
+result TEXT NOT NULL CHECK (result IN ('Win','Loss','Draw')),
+FOREIGN KEY (team_id) REFERENCES teams(id),
+FOREIGN KEY (match_id) REFERENCES matches(id) 
+);
+
+INSERT INTO results
+(team_id, match_id, result)
+VALUES
+(5,2,'Win'),
+(1,2,'Loss'),
+(3,1, 'Draw'),
+(2,1, 'Draw'),
+(6,3,'Win'),
+(4,3,'Loss');
 
 
 CREATE TABLE goals 
